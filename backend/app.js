@@ -7,9 +7,19 @@ const HttpError = require("./controllers/places-controllers");
 const userRoutes = require("./routes/users-routes");
 const app = express();
 
-require('dotenv').config();
+require("dotenv").config();
 
 app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  next();
+});
 
 app.use("/api/places", placesRoutes); // => /api/places...
 app.use("/api/users", userRoutes);
@@ -29,7 +39,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.uxfclu9.mongodb.net/places?retryWrites=true&w=majority&appName=Cluster0`
+    `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.uxfclu9.mongodb.net/mern?retryWrites=true&w=majority&appName=Cluster0`
   )
   .then(() => {
     console.log("Connected!");
