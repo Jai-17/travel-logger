@@ -1,36 +1,41 @@
 import { useParams } from "react-router-dom";
 import PlaceList from "../components/PlaceList";
-
-const DUMMY_PLACES = [
-    {
-        id: 'p1',
-        title: 'Emp. State Building',
-        description: 'One of the most famous sky scrapers in the world!.',
-        imageUrl: 'https://media.timeout.com/images/101705309/image.jpg',
-        address: 'WOW',
-        location: {
-            lat: 40,
-            lng: -73,
-        },
-        creator: 'u1'
-    },
-    {
-        id: 'p2',
-        title: 'Empire States Building',
-        description: 'One ofd the most famous sky scrapers in the world!.',
-        imageUrl: 'https://www.esbnyc.com/sites/default/files/2020-01/ESB%20Day.jpg',
-        address: 'WOW',
-        location: {
-            lat: 40,
-            lng: 70,
-        },
-        creator: 'u2'
-    }
-]
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import { useEffect, useState } from "react";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
 export default function UserPlaces() {
-    const { userId } = useParams();
-    const loadedPlaces = DUMMY_PLACES.filter(place => place.creator == userId);
+  const [loadedPlaces, setLoadedPlace] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-    return <PlaceList items={loadedPlaces} />
+  const { userId } = useParams();
+
+  useEffect(() => {
+    const fetchPlace = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:3000/api/places/user/${userId}`
+        );
+        setLoadedPlace(responseData.places);
+      } catch (err) {}
+    };
+    fetchPlace();
+  }, [sendRequest, userId]);
+
+  const placeDeleteHandler = (deletedPlaceId) => {
+    setLoadedPlace(prevPlaces => prevPlaces.filter(place => place.id !== deletedPlaceId));
+  }
+
+  return (
+    <>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} onDeletePlace={placeDeleteHandler} />}
+    </>
+  );
 }

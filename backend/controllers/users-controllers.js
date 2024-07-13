@@ -55,7 +55,7 @@ const signup = async (req, res, next) => {
     image:
       "https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?cs=srgb&dl=pexels-anjana-c-169994-674010.jpg&fm=jpg",
     password,
-    places: []
+    places: [],
   });
 
   try {
@@ -92,7 +92,10 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ message: "Logged in!" });
+  res.json({
+    message: "Logged in!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getUsers = getUsers;

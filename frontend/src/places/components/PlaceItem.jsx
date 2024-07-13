@@ -5,8 +5,11 @@ import { useContext, useState } from "react";
 import Modal from "../../shared/components/UIElements/Modal";
 import MapComp from "../../shared/components/UIElements/Map";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
 export default function PlaceItem(props) {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const auth = useContext(AuthContext);
 
@@ -29,13 +32,20 @@ export default function PlaceItem(props) {
     setShowConfirmModal(false);
   }
 
-  function confirmDeleteHandler() {
+  async function confirmDeleteHandler() {
     setShowConfirmModal(false);
-    console.log("DELETING...");
+    try {
+      await sendRequest(
+        `http://localhost:3000/api/places/${props.id}`,
+        "DELETE"
+      );
+      props.onDelete(props.id);
+    } catch (err) {}
   }
 
   return (
     <>
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -71,6 +81,7 @@ export default function PlaceItem(props) {
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={props.image} alt={props.title} />
           </div>
@@ -83,11 +94,14 @@ export default function PlaceItem(props) {
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            {auth.isLoggedIn &&
-            <Button to={`/places/${props.id}`}>EDIT</Button>}
-            {auth.isLoggedIn && <Button danger onClick={showDeleteWarningHandler}>
-              DELETE
-            </Button>}
+            {auth.userId === props.creatorId && (
+              <Button to={`/places/${props.id}`}>EDIT</Button>
+            )}
+            {auth.userId === props.creatorId && (
+              <Button danger onClick={showDeleteWarningHandler}>
+                DELETE
+              </Button>
+            )}
           </div>
         </Card>
       </li>
