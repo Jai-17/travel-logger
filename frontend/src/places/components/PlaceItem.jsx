@@ -7,6 +7,7 @@ import MapComp from "../../shared/components/UIElements/Map";
 import { AuthContext } from "../../shared/context/auth-context";
 import { useHttpClient } from "../../shared/hooks/http-hook";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 
 export default function PlaceItem(props) {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();

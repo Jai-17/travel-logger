@@ -15,7 +15,7 @@ export default function UserPlaces() {
     const fetchPlace = async () => {
       try {
         const responseData = await sendRequest(
-          `http://localhost:3000/api/places/user/${userId}`
+          `http://localhost:3000/api/places/users/${userId}`
         );
         setLoadedPlace(responseData.places);
       } catch (err) {}
