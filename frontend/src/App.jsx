@@ -11,7 +11,8 @@ import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import Auth from "./users/pages/Auth";
 import { AuthContext } from "./shared/context/auth-context";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "./shared/hooks/auth-hook";
 
 let routes;
 
@@ -65,23 +66,21 @@ const router = createBrowserRouter([
 
 // const router = createBrowserRouter([routes]);
 
+let logoutTimer;
+
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState(false);
 
-  const login = useCallback((uid) => {
-    setIsLoggedIn(true);
-    setUserId(uid);
-  }, []);
-
-  const logout = useCallback(() => {
-    setIsLoggedIn(false);
-    setUserId(null);
-  }, []);
+  const { token, login, logout, userId } = useAuth();
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, userId: userId, login: login, logout: logout }}
+      value={{
+        isLoggedIn: !!token,
+        token: token,
+        userId: userId,
+        login: login,
+        logout: logout,
+      }}
     >
       <RouterProvider router={router} />
     </AuthContext.Provider>
